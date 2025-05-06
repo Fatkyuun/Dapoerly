@@ -212,7 +212,7 @@
 
                                     //jika ada pencarian tambahkan kondisi WHERE 
                                     if (!empty($query)) {
-                                        $sql_query .= "WHERE nm_ktg LIKE '%$query%'";
+                                        $sql_query .= " WHERE nm_ktg LIKE '%$query%'";
                                     }
 
                                     $sql = mysqli_query($koneksi, $sql_query);
