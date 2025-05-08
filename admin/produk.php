@@ -195,6 +195,7 @@
                                         <th scope="col">Harga</th>
                                         <th scope="col">Stok</th>
                                         <th scope="col">Nama Kategori</th>
+                                        <th scope="col">Deskripsi</th>
                                         <th scope="col">Gambar</th>
                                         <th scope="col">Aksi</th>
                                     </tr>
@@ -223,28 +224,29 @@
                                                 <td><?php echo $hasil['nm_produk']; ?></td>
                                                 <td>RP <?php echo number_format($hasil['harga'], 0, ', ', '.'); ?></td>
                                                 <td><?php echo $hasil['stok']; ?></td>
-                                                <td><?php echo $hasil['desk']; ?></td>
                                                 <td><?php echo $hasil['nm_kategori']; ?></td>
+                                                <td><?php echo $hasil['desk']; ?></td>
                                                 <td>
                                                     <?php if (!empty($hasil['gambar'])) { ?>
                                                         <img src="produk_img/<?php echo $hasil['gambar']; ?>" width="100">
+                                                    <?php } else { ?>
+                                                        Tidak ada Gambar
                                                     <?php } ?>
-                                                    Tidak ada Gambar
-                                                <?php } ?>
-                                            </td>
-                                            <td>
-                                                <a href="e_produk.php?id=<?php echo $hasil['id_produk']; ?>"
-                                                    class="btn btn-warning">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                                <a href="h_produk.php?id=<?php echo $hasil['id_produk']; ?>"
-                                                    class="btn btn-danger"
-                                                    onclick="return confirm('Apakah anda yakin ingin menghapus data?')">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <?php
+                                                </td>
+                                                <td>
+                                                    <a href="e_produk.php?id=<?php echo $hasil['id_produk']; ?>"
+                                                        class="btn btn-warning">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                    <a href="h_produk.php?id=<?php echo $hasil['id_produk']; ?>"
+                                                        class="btn btn-danger"
+                                                        onclick="return confirm('Apakah anda yakin ingin menghapus data?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
                                     } else {
                                         ?>
                                         <tr>
@@ -253,7 +255,6 @@
                                         <?php
                                     }
                                     ?>
-
                                 </tbody>
                             </table>
                             <!-- End Table with stripped rows -->
