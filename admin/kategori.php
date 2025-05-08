@@ -107,14 +107,14 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link " href="index.php">
+                <a class="nav-link collapsed" href="index.php">
                     <i class="bi bi-houses"></i>
                     <span>Beranda</span>
                 </a>
             </li><!-- End Beranda Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="kategori.php">
+                <a class="nav-link" href="kategori.php">
                     <i class="bi bi-box2"></i>
                     <span>Kategori Produk</span>
                 </a>
@@ -208,11 +208,11 @@
                                     $query = isset($_POST['query']) ? mysqli_real_escape_string($koneksi, $_POST['query']) : '';
 
                                     //query dasar
-                                    $sql_query = "SELECT id_ktg, nm_ktg FROM tb_ktg";
+                                    $sql_query = "SELECT id_kategori, nm_kategori FROM tb_kategori";
 
                                     //jika ada pencarian tambahkan kondisi WHERE 
                                     if (!empty($query)) {
-                                        $sql_query .= " WHERE nm_ktg LIKE '%$query%'";
+                                        $sql_query .= " WHERE nm_kategori LIKE '%$query%'";
                                     }
 
                                     $sql = mysqli_query($koneksi, $sql_query);
@@ -222,13 +222,13 @@
                                             ?>
                                             <tr>
                                                 <td><?php echo $no++; ?></td>
-                                                <td><?php echo $hasil['nm_ktg']; ?></td>
+                                                <td><?php echo $hasil['nm_kategori']; ?></td>
                                                 <td>
-                                                    <a href="e_kategori.php?id=<?php echo $hasil['id_ktg']; ?>"
+                                                    <a href="e_kategori.php?id=<?php echo $hasil['id_kategori']; ?>"
                                                         class="btn btn-warning">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </a>
-                                                    <a href="h_kategori.php?id=<?php echo $hasil['id_ktg']; ?>"
+                                                    <a href="h_kategori.php?id=<?php echo $hasil['id_kategori']; ?>"
                                                         class="btn btn-danger"
                                                         onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">
                                                         <i class="bi bi-trash"></i>

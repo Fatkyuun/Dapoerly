@@ -65,7 +65,7 @@
                 <li class="nav-item dropdown pe-3">
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                        <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+                        <img src="assets/img/FotoIjazah.jpg" alt="Profile" class="rounded-circle">
                         <!-- profile-img.jpg diganti dengan foto kalian -->
                     </a><!-- End Profile Iamge Icon -->
 
@@ -208,9 +208,9 @@
                                     $query = isset($_GET['query']) ? mysqli_real_escape_string($koneksi, $_GET['query']) : '';
 
                                     // Tambahkan Where jika Query tidak kosong
-                                    $sql_query = "SELECT tb_produk.*, tb_ktg.nm_ktg FROM tb_produk LEFT JOIN tb_ktg ON tb_produk.id_ktg = tb_ktg.id_ktg";
+                                    $sql_query = "SELECT tb_produk.*, tb_kategori.nm_kategori FROM tb_produk LEFT JOIN tb_kategori ON tb_produk.id_kategori = tb_kategori.id_kategori";
                                     if (!empty($query)) {
-                                        $sql_query .= " WHERE tb_produk.nm_produk LIKE '%$query%' OR tb_ktg.nm_ktg LIKE '%$query%' OR tb_produk.desk LIKE '%$query%'";
+                                        $sql_query .= " WHERE tb_produk.nm_produk LIKE '%$query%' OR tb_kategori.nm_kategori LIKE '%$query%' OR tb_produk.desk LIKE '%$query%'";
                                     }
 
                                     $sql = mysqli_query($koneksi, $sql_query);
@@ -224,7 +224,7 @@
                                                 <td>RP <?php echo number_format($hasil['harga'], 0, ', ', '.'); ?></td>
                                                 <td><?php echo $hasil['stok']; ?></td>
                                                 <td><?php echo $hasil['desk']; ?></td>
-                                                <td><?php echo $hasil['nm_ktg']; ?></td>
+                                                <td><?php echo $hasil['nm_kategori']; ?></td>
                                                 <td>
                                                     <?php if (!empty($hasil['gambar'])) { ?>
                                                         <img src="produk_img/<?php echo $hasil['gambar']; ?>" width="100">
@@ -235,12 +235,12 @@
                                             <td>
                                                 <a href="e_produk.php?id=<?php echo $hasil['id_produk']; ?>"
                                                     class="btn btn-warning">
-                                                    <i> class="bi bi-pencil-square"></i>
+                                                    <i class="bi bi-pencil-square"></i>
                                                 </a>
                                                 <a href="h_produk.php?id=<?php echo $hasil['id_produk']; ?>"
                                                     class="btn btn-danger"
                                                     onclick="return confirm('Apakah anda yakin ingin menghapus data?')">
-                                                    <i> class="bi bi-trash"></i>
+                                                    <i class="bi bi-trash"></i>
                                                 </a>
                                             </td>
                                         </tr>
@@ -272,7 +272,7 @@
             &copy; Copyright <strong><span>Dapoerly</span></strong>. All Rights Reserved
         </div>
         <div class="credits">
-            Designed by <a href="https://instagram.com/namaig/">Fathir Alamsyah Mahardika</a>
+            Designed by <a href="https://instagram.com/fatkyuun/">Fathir Alamsyah Mahardika</a>
         </div>
     </footer><!-- End Footer -->
 

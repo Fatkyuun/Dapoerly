@@ -2,7 +2,7 @@
 include "koneksi.php";
 
 if (isset($_POST['simpan'])) {
-    $auto = mysqli_query($koneksi, "select max(id_ktg) as max_code from tb_ktg");
+    $auto = mysqli_query($koneksi, "select max(id_kategori) as max_code from tb_kategori");
     $hasil = mysqli_fetch_array($auto);
     $code = $hasil['max_code'];
     $urutan = (int) substr($code, 1, 3);
@@ -11,7 +11,7 @@ if (isset($_POST['simpan'])) {
     $id_kategori = $huruf . sprintf("%03s", $urutan);
     $nm_kategori = $_POST['nm_kategori'];
 
-    $query = mysqli_query($koneksi, "INSERT INTO tb_ktg(id_ktg, nm_ktg) VALUES ('$id_kategori', '$nm_kategori')");
+    $query = mysqli_query($koneksi, "INSERT INTO tb_kategori(id_kategori, nm_kategori) VALUES ('$id_kategori', '$nm_kategori')");
     if ($query) {
         echo "<script>alert('Data berhasil ditambahkan!');</script>";
         header("refresh:0; kategori.php");
@@ -116,14 +116,14 @@ if (isset($_POST['simpan'])) {
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link " href="index.php">
+                <a class="nav-link collapsed" href="index.php">
                     <i class="bi bi-houses"></i>
                     <span>Beranda</span>
                 </a>
             </li><!-- End Beranda Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="kategori.php">
+                <a class="nav-link" href="kategori.php">
                     <i class="bi bi-box2"></i>
                     <span>Kategori Produk</span>
                 </a>
@@ -188,7 +188,7 @@ if (isset($_POST['simpan'])) {
                             <form class="row g-3 mt-2" method='post'>
                                 <div class="col-12">
                                     <label for="nm_kategori" class="form-label">Nama Kategori</label>
-                                    <input type="text" class="form-control" id="nm_ktg" name="nm_kategori"
+                                    <input type="text" class="form-control" id="nm_kategori" name="nm_kategori"
                                         placeholder="Masukkan Nama Kategori Produk">
                                 </div>
                                 <div class="text-center">
