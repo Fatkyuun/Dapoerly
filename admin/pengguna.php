@@ -180,7 +180,7 @@
         <section class="section">
             <div class="row">
 
-                <div class="col-lg-6">
+                <div class="col-lg-12">
 
                     <div class="card">
                         <div class="card-body">
@@ -213,35 +213,35 @@
 
                                     $sql = mysqli_query($koneksi, $sql_query);
 
-                                            if (mysqli_num_rows($sql) > 0) {
-                                                while ($hasil = mysqli_fetch_array($sql)) {
+                                    if (mysqli_num_rows($sql) > 0) {
+                                        while ($hasil = mysqli_fetch_array($sql)) {
                                             ?>
-                                                    <tr>
-                                                        <td><?php echo $no++; ?></td>
-                                                        <td><?php echo $hasil['username']; ?></td>
-                                                        <td><?php echo $hasil['status']; ?></td>
-                                                        <td>
-                                                            <a href="h_pengguna.php?id=<?php echo $hasil['id_user']; ?>"
-                                                                class="btn btn-danger"
-                                                                onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data?')">
-                                                                <i class="bi bi-trash"></i>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                <?php
-                                                }
-                                            } else {
-                                                ?>
-                                                <tr>
-                                                    <td colspan="4" class="text-center">Data tidak ditemukan</td>
-                                                </tr>
-                                                <?php
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                    <!-- End Table with stripped rows -->
-                                    <!-- End Table with stripped rows -->
+                                            <tr>
+                                                <td><?php echo $no++; ?></td>
+                                                <td><?php echo $hasil['username']; ?></td>
+                                                <td><?php echo $hasil['status']; ?></td>
+                                                <td>
+                                                    <a href="h_pengguna.php?id=<?php echo $hasil['id_user']; ?>"
+                                                        class="btn btn-danger"
+                                                        onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
+                                    } else {
+                                        ?>
+                                        <tr>
+                                            <td colspan="4" class="text-center">Data tidak ditemukan</td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                            <!-- End Table with stripped rows -->
+                            <!-- End Table with stripped rows -->
 
                         </div>
                     </div>
@@ -254,7 +254,7 @@
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
         <div class="copyright">
-            &copy; Copyright <strong><span>Nama Website</span></strong>. All Rights Reserved
+            &copy; Copyright <strong><span>Dapoerly</span></strong>. All Rights Reserved
         </div>
         <div class="credits">
             Designed by <a href="https://instagram.com/fatkyuun/">Fathir Alamsyah Mahardika</a>

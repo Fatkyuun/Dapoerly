@@ -182,7 +182,7 @@ if (isset($_POST['simpan'])) {
         </div><!-- End Page Title -->
         <section class="section">
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
                             <form class="row g-3 mt-2" method='post'>
