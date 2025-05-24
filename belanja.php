@@ -81,6 +81,7 @@ session_start()
         .minicart-block {
             margin-right: 30px;
         }
+
         .user .qty {
             margin-left: 5px;
             font-weight: bold;
@@ -243,7 +244,7 @@ session_start()
                                         role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span class="icon-qty-combine">
                                             <i class="fas fa-user biolife-icon"></i>
-                                            <span class="qty"><?= htmlspecialchars($_SESSION['username']);  ?></span>
+                                            <span class="qty"><?= htmlspecialchars($_SESSION['username']); ?></span>
                                             <!-- Ganti qty jadi username -->
                                         </span>
                                     </a>
@@ -426,7 +427,7 @@ session_start()
                                                         case 'sayuran':
                                                             echo '<li>Segar Dipanen Setiap Hari</li><li>Tanpa Obat-Obatan Berbahaya</li>';
                                                             break;
-                                                        case 'daging':
+                                                        case 'daging sapi':
                                                             echo '<li>Daging Segar</li><li>Potongan Segar dan Berkualitas</li>';
                                                             break;
                                                         case 'buah':
@@ -435,20 +436,14 @@ session_start()
                                                         case 'ikan':
                                                             echo '<li>Ikan Segar dari Nelayan Jago</li><li>Tanpa Formalin Dan Bahan Pengawet lainnya</li>';
                                                             break;
-                                                        case 'bumbu masakan':
+                                                        case 'bumbu':
                                                             echo '<li>Bumbu Dapur Alami Langsung Dari Alam</li><li>Rempah-rempah Pilihan Terbaik</li>';
                                                             break;
                                                         case 'makanan beku':
                                                             echo '<li>Kualitas Terjaga dengan Pembekuan</li><li>Siap Masak, Praktis & Higienis</li>';
                                                             break;
-                                                        case 'bahan pokok':
-                                                            echo '<li>Kualitas Terjaga dengan Pembekuan</li><li>Siap Masak, Praktis & Higienis</li>';
-                                                            break;
-                                                        case 'makanan instan':
-                                                            echo '<li>Kualitas Terjaga dengan Pembekuan</li><li>Siap Masak, Praktis & Higienis</li>';
-                                                            break;
-                                                        case 'produk impor':
-                                                            echo '<li>Kualitas Terjaga dengan Pembekuan</li><li>Siap Masak, Praktis & Higienis</li>';
+                                                        case 'daging ayam':
+                                                            echo '<li>Daging Segar</li><li>Potongan Segar dan Berkualitas</li>';
                                                             break;
                                                         default:
                                                             echo '<li> </li><li> </li>';
