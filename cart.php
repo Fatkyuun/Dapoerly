@@ -293,13 +293,12 @@ $result_lainnya = $koneksi->query($query_lainnya);
         <!-- Main content -->
         <div id="main-content" class="main-content">
             <div class="container">
-
                 <!--Cart Table-->
                 <div class="shopping-cart-container">
                     <div class="row">
                         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
                             <h3 class="box-title">Keranjang Anda</h3>
-                            <form class="shopping-cart-form" action="#" method="post">
+                            <form class="shopping-cart-form" method="post">
                                 <table class="shop_table cart-form">
                                     <thead>
                                         <tr>
@@ -315,39 +314,45 @@ $result_lainnya = $koneksi->query($query_lainnya);
                                     include 'admin/koneksi.php';
 
                                     if (!isset($_SESSION['id_user'])) {
-                                        //kalau belum login, redirect (opsional)
-                                        header("location: login.php");
+                                        // kalau belum login, redirect (opsional)
+                                        header("Location: login.php");
                                         exit;
                                     }
 
                                     $id_user = $_SESSION['id_user'];
 
-                                    //cek jika tombol update ditekan
-                                    if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_keranjang'])) {
+                                    // Cek jika tombol update ditekan
+                                    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_keranjang'])) {
                                         $berhasil_update = false;
                                         $gagal_update = false;
 
                                         foreach ($_POST as $key => $value) {
                                             if (strpos($key, 'qty') === 0) {
-                                                $id_pesanan = mysqli_real_escape_string($koneksi, str_replace('qty', '', $key));
+                                                $id_pesanan = str_replace('qty', '', $key);
                                                 $id_pesanan = mysqli_real_escape_string($koneksi, $id_pesanan);
                                                 $qty = intval($value);
 
                                                 if ($qty > 0) {
-                                                    //ambil id_produk dan stok dari pesanan
-                                                    $get_produk = mysqli_query($koneksi, "SELECT pr.id_produk, pr.stok FROM tb_pesanan p JOIN tb_produk pr ON p.id_produk = pr.id_produk WHERE p.id_pesanan = '$id_pesanan' AND p.id_user = '$id_user'");
+                                                    // Ambil id_produk dan stok dari pesanan
+                                                    $get_produk = mysqli_query($koneksi, "
+                                                        SELECT pr.id_produk, pr.stok 
+                                                        FROM tb_pesanan p
+                                                        JOIN tb_produk pr ON p.id_produk = pr.id_produk
+                                                        WHERE p.id_pesanan = '$id_pesanan' AND p.id_user = '$id_user'
+                                                    ");
                                                     $produk = mysqli_fetch_assoc($get_produk);
 
                                                     if ($produk) {
                                                         $stok = intval($produk['stok']);
 
                                                         if ($qty <= $stok) {
+                                                            // Update qty
                                                             $query = "UPDATE tb_pesanan SET qty = $qty WHERE id_pesanan = '$id_pesanan' AND id_user = '$id_user'";
                                                             if (mysqli_query($koneksi, $query)) {
                                                                 $berhasil_update = true;
                                                             }
                                                         } else {
-                                                            //qty melebihi stok
+                                                            // Qty melebihi stok
                                                             $gagal_update = true;
                                                         }
                                                     }
@@ -355,82 +360,72 @@ $result_lainnya = $koneksi->query($query_lainnya);
                                             }
                                         }
 
-                                        //tampilkan alert bedasarkan hasil
+                                        // Tampilkan alert berdasarkan hasil
                                         if ($berhasil_update && !$gagal_update) {
-                                            echo "<script>alert('Jumlah Produk Berhasil Diperbarui!');</script>";
-                                        } else if ($gagal_update && !$berhasil_update) {
-                                            echo "<script>alert('Gagal Memperbarui: Jumlah Melebihi Stok Produk!');</script>";
-                                        } else if ($berhasil_update && !$gagal_update) {
-                                            echo "<script>alert('Sebagian Produk Berhasil Diperbarui. Beberapa Jumlah Melebihi Stok!');</script>";
+                                            echo "<script>alert('Jumlah produk berhasil diperbarui!');</script>";
+                                        } elseif ($gagal_update && !$berhasil_update) {
+                                            echo "<script>alert('Gagal memperbarui: jumlah melebihi stok produk!');</script>";
+                                        } elseif ($berhasil_update && $gagal_update) {
+                                            echo "<script>alert('Sebagian produk berhasil diperbarui. Beberapa jumlah melebihi stok!');</script>";
                                         }
                                     }
 
-                                    //ambil ulang data setelah (atau sebelum) update
-                                    $query = "SELECT p.*, pr.nm_produk, pr.harga, pr.gambar
-                FROM tb_pesanan p
-                JOIN tb_produk pr ON p.id_produk = pr.id_produk
-                WHERE p.id_user = '$id_user'";
+                                    // Ambil ulang data setelah (atau sebelum) update
+                                    $query = "SELECT p.*, pr.nm_produk, pr.harga, pr.gambar 
+          FROM tb_pesanan p 
+          JOIN tb_produk pr ON p.id_produk = pr.id_produk 
+          WHERE p.id_user = '$id_user'";
                                     $result = mysqli_query($koneksi, $query);
 
                                     $subtotal = 0;
                                     ?>
 
                                     <tbody>
-                                        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                                             <?php $total_item = $row['harga'] * $row['qty']; ?>
                                             <tr class="cart_item">
                                                 <td class="product-thumbnail" data-title="Product Name">
-                                                    <a class="prod-thumb" href="#">
-                                                        <figure><img width="113" height="113"
-                                                                src="admin/produk_img/<?= $row["gambar"]; ?>"
-                                                                alt="<?= $row["nm_produk"]; ?>"></figure>
+                                                    <a class="prd-thumb" href="#">
+                                                        <figure><img width="113" height="113" src="admin/produk_img/<?= $row['gambar']; ?>" alt="<?= $row['nm_produk']; ?>"></figure>
                                                     </a>
-                                                    <a class="prod-name" href="#"><?= $row['nm_produk']; ?></a>
+                                                    <a class="prd-name" href="#"><?= $row['nm_produk']; ?></a>
                                                     <div class="action">
-                                                        <a href="hapus_item.php?id=<?= $row['id_pesanan']; ?>"><i
-                                                                class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                                        <a href="hapus_item.php?id=<?= $row['id_pesanan']; ?>"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
                                                     </div>
                                                 </td>
                                                 <td class="product-price" data-title="Price">
                                                     <div class="price price-contain">
-                                                        <ins><span class="price-amount"><span
-                                                                    class="currencySymbol">Rp.</span><?= number_format($row['harga'], 0, '.', '.'); ?></span></ins>
+                                                        <ins><span class="price-amount"><span class="currencySymbol">Rp. </span><?= number_format($row['harga'], 0, ',', '.'); ?></span></ins>
                                                     </div>
                                                 </td>
                                                 <td class="product-quantity" data-title="Quantity">
                                                     <div class="quantity-box type1">
                                                         <div class="qty-input">
-                                                            <input type="number" name="qty<?= $row['id_pesanan']; ?>"
-                                                                value="<?= $row['qty']; ?>" data-max_value="20"
-                                                                data-min_value="1" data-step="1">
-                                                            <a type="button" class="qty-btn btn-up"><i
-                                                                    class="fa fa-caret-up" aria-hidden="true"></i></a>
-                                                            <a type="button" class="qty-btn btn-down"><i
-                                                                    class="fa fa-caret-down" aria-hidden="true"></i></a>
+                                                            <input type="number" name="qty<?= $row['id_pesanan']; ?>" value="<?= $row['qty']; ?>" data-max_value="20" data-min_value="1" data-step="1">
+                                                            <a type="button" class="qty-btn btn-up"><i class="fa fa-caret-up" aria-hidden="true"></i></a>
+                                                            <a type="button" class="qty-btn btn-down"><i class="fa fa-caret-down" aria-hidden="true"></i></a>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td class="product-subtotal" data-title="Total">
                                                     <div class="price price-contain">
-                                                        <ins><span class="price-amount"><span
-                                                                    class="currencySymbol">Rp.</span><?= number_format($total_item, 0, ',', '.'); ?></span></ins>
+                                                        <ins><span class="price-amount"><span class="currencySymbol">Rp. </span><?= number_format($total_item, 0, ',', '.'); ?></span></ins>
                                                     </div>
                                                 </td>
                                             </tr>
                                             <?php $subtotal += $total_item; ?>
                                         <?php endwhile; ?>
+
                                         <tr class="cart_item wrap-buttons">
                                             <td class="wrap-btn-control" colspan="4">
                                                 <a class="btn back-to-shop" href="belanja.php">Kembali</a>
-                                                <button class="btn btn-update" type="submit"
-                                                    name="update_keranjang">Perbarui Keranjang</button>
+                                                <button class="btn btn-update" type="submit" name="update_keranjang">Perbarui Keranjang</button>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </form>
                         </div>
-
                         <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
                             <?php
                             // Hitung diskon
@@ -454,8 +449,8 @@ $result_lainnya = $koneksi->query($query_lainnya);
                                     <span class="stt-price">Rp. <?= number_format($diskon, 0, ',', '.'); ?></span>
                                 </div>
                                 <div class="subtotal-line">
-                                    <b class="att-name">Total Bayar</b>
-                                    <span class="att-price">Rp. <?= number_format($total_bayar, 0, ',', '.'); ?></span>
+                                    <b class="stt-name">Total Bayar</b>
+                                    <span class="stt-price">Rp. <?= number_format($total_bayar, 0, ',', '.'); ?></span>
                                 </div>
                                 <div class="tax-fee">
                                 </div>
@@ -464,27 +459,29 @@ $result_lainnya = $koneksi->query($query_lainnya);
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <script>
-                            function checkout() {
-                                if (confirm("Yakin ingin checkout sekarang?")) {
-                                    fetch('checkout.php', {
-                                        method: 'POST'
-                                    })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            alert(data.message);
-                                            if (data.success) {
-                                                window.location.href = "belanja.php";
-                                            }
-                                        })
-                                        .catch(error => {
-                                            alert("Terjadi kesalahan saat proses checkout.");
-                                            console.error(error);
-                                        });
-                                }
-                            }
-                        </script>
+                <script>
+                    function checkout() {
+                        if (confirm("Yakin ingin checkout sekarang?")) {
+                            fetch('checkout.php', {
+                                    method: 'POST'
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    alert(data.message);
+                                    if (data.success) {
+                                        window.location.href = "belanja.php";
+                                    }
+                                })
+                                .catch(error => {
+                                    alert("Terjadi kesalahan saat proses checkout.");
+                                    console.error(error);
+                                });
+                        }
+                    }
+                </script>
 
                         <!-- related products -->
                         <div class="product-related-box single-layout">
@@ -538,120 +535,109 @@ $result_lainnya = $koneksi->query($query_lainnya);
                 </div>
             </div>
 
-            <!-- FOOTER -->
-            <footer id="footer" class="footer layout-03">
-                <div class="footer-content background-footer-03">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-lg-4 col-md-4 col-sm-9">
-                                <section class="footer-item">
-                                    <a href="index.php" class="biolife-logo"><img src="assets/images/favicon.png"
-                                            alt="biolife logo"><b
-                                            style="font-size: 150% ; color: green;">Dapoerly</b></a>
-                                    <div class="footer-phone-info">
-                                        <i class="biolife-icon icon-head-phone"></i>
-                                        <p class="r-info">
-                                            <span>Ada Pertanyaan ?</span>
-                                            <span>085895996383</span>
+    <!-- FOOTER -->
+    <footer id="footer" class="footer layout-03">
+        <div class="footer-content background-footer-03">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-9">
+                        <section class="footer-item">
+                            <a href="index.php" class="biolife-logo"><img src="assets/images/favicon.png"
+                                    alt="biolife logo"><b style="font-size: 150% ; color: green;">Dapoerly</b></a>
+                            <div class="footer-phone-info">
+                                <i class="biolife-icon icon-head-phone"></i>
+                                <p class="r-info">
+                                    <span>Ada Pertanyaan ?</span>
+                                    <span>085895996383</span>
+                                </p>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 md-margin-top-5px sm-margin-top-50px xs-margin-top-40px">
+                        <section class="footer-item">
+                        </section>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 md-margin-top-5px sm-margin-top-50px xs-margin-top-40px">
+                        <section class="footer-item">
+                            <h3 class="section-title">Layanan Transportasi</h3>
+                            <div class="contact-info-block footer-layout xs-padding-top-10px">
+                                <ul class="contact-lines">
+                                    <li>
+                                        <p class="info-item">
+                                            <i class="biolife-icon icon-location"></i>
+                                            <b class="desc">Kedewan, Bojonegoro, Jawa Timur, Indonesia</b>
                                         </p>
-                                    </div>
-                                </section>
+                                    </li>
+                                    <li>
+                                        <p class="info-item">
+                                            <i class="biolife-icon icon-phone"></i>
+                                            <b class="desc">Telepon: 085895996383</b>
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="info-item">
+                                            <i class="biolife-icon icon-letter"></i>
+                                            <b class="desc">Email: dapoerly@gmail.com</b>
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p class="info-item">
+                                            <i class="biolife-icon icon-clock"></i>
+                                            <b class="desc">Hari Buka: Setiap hari, Selain hari kiamat</b>
+                                        </p>
+                                    </li>
+                                </ul>
                             </div>
-                            <div
-                                class="col-lg-4 col-md-4 col-sm-6 md-margin-top-5px sm-margin-top-50px xs-margin-top-40px">
-                                <section class="footer-item">
-                                </section>
+                            <div class="biolife-social inline">
+                                <ul class="socials">
+                                    <li><a href="#" title="twitter" class="socail-btn"><i class="fa fa-twitter"
+                                                aria-hidden="true"></i></a></li>
+                                    <li><a href="#" title="facebook" class="socail-btn"><i class="fa fa-facebook"
+                                                aria-hidden="true"></i></a></li>
+                                    <li><a href="#" title="pinterest" class="socail-btn"><i class="fa fa-pinterest"
+                                                aria-hidden="true"></i></a></li>
+                                    <li><a href="#" title="youtube" class="socail-btn"><i class="fa fa-youtube"
+                                                aria-hidden="true"></i></a></li>
+                                    <li><a href="https://instagram.com/fatkyuun/" title="instagram"
+                                            class="socail-btn"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+                                    </li>
+                                </ul>
                             </div>
-                            <div
-                                class="col-lg-4 col-md-4 col-sm-6 md-margin-top-5px sm-margin-top-50px xs-margin-top-40px">
-                                <section class="footer-item">
-                                    <h3 class="section-title">Layanan Transportasi</h3>
-                                    <div class="contact-info-block footer-layout xs-padding-top-10px">
-                                        <ul class="contact-lines">
-                                            <li>
-                                                <p class="info-item">
-                                                    <i class="biolife-icon icon-location"></i>
-                                                    <b class="desc">Kedewan, Bojonegoro, Jawa Timur,
-                                                        Indonesia</b>
-                                                </p>
-                                            </li>
-                                            <li>
-                                                <p class="info-item">
-                                                    <i class="biolife-icon icon-phone"></i>
-                                                    <b class="desc">Telepon: 085895996383</b>
-                                                </p>
-                                            </li>
-                                            <li>
-                                                <p class="info-item">
-                                                    <i class="biolife-icon icon-letter"></i>
-                                                    <b class="desc">Email: dapoerly@gmail.com</b>
-                                                </p>
-                                            </li>
-                                            <li>
-                                                <p class="info-item">
-                                                    <i class="biolife-icon icon-clock"></i>
-                                                    <b class="desc">Jam Buka: Setiap hari, Selain hari
-                                                        kiamat</b>
-                                                </p>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="biolife-social inline">
-                                        <ul class="socials">
-                                            <li><a href="#" title="twitter" class="socail-btn"><i class="fa fa-twitter"
-                                                        aria-hidden="true"></i></a>
-                                            </li>
-                                            <li><a href="#" title="facebook" class="socail-btn"><i
-                                                        class="fa fa-facebook" aria-hidden="true"></i></a>
-                                            </li>
-                                            <li><a href="#" title="pinterest" class="socail-btn"><i
-                                                        class="fa fa-pinterest" aria-hidden="true"></i></a>
-                                            </li>
-                                            <li><a href="#" title="youtube" class="socail-btn"><i class="fa fa-youtube"
-                                                        aria-hidden="true"></i></a>
-                                            </li>
-                                            <li><a href="https://instagram.com/fatkyuun/" title="instagram"
-                                                    class="socail-btn"><i class="fa fa-instagram"
-                                                        aria-hidden="true"></i></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </section>
-                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="separator sm-margin-top-70px xs-margin-top-40px"></div>
                         </div>
-                        <div class="row">
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    <div class="separator sm-margin-top-70px xs-margin-top-40px"></div>
-                                </div>
-                                <div class="col-lg-6 col-sm-6 col-xs-12">
-                                    <div class="copy-right-text">
-                                        <p><a href="templateshub.net">&copy; Copyright
-                                                <strong><span>2025</span></strong>. All
-                                                Rights Reserved</a></p>
-                                    </div>
+                        <div class="col-lg-6 col-sm-6 col-xs-12">
+                            <div class="copy-right-text">
+                                <p><a href="templateshub.net">&copy; Copyright <strong><span>2025</span></strong>. All
+                                        Rights Reserved</a></p>
+                            </div>
 
-                                </div>
-                                <div class="col-lg-6 col-sm-6 col-xs-12">
-                                    <div class="payment-methods">
-                                        <ul>
-                                            <li><a href="#" class="payment-link"><img src="assets/images/card1.jpg"
-                                                        width="51" height="36" alt=""></a></li>
-                                            <li><a href="#" class="payment-link"><img src="assets/images/card2.jpg"
-                                                        width="51" height="36" alt=""></a></li>
-                                            <li><a href="#" class="payment-link"><img src="assets/images/card3.jpg"
-                                                        width="51" height="36" alt=""></a></li>
-                                            <li><a href="#" class="payment-link"><img src="assets/images/card4.jpg"
-                                                        width="51" height="36" alt=""></a></li>
-                                            <li><a href="#" class="payment-link"><img src="assets/images/card5.jpg"
-                                                        width="51" height="36" alt=""></a></li>
-                                        </ul>
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-6 col-xs-12">
+                            <div class="payment-methods">
+                                <ul>
+                                    <li><a href="#" class="payment-link"><img src="assets/images/card1.jpg" width="51"
+                                                height="36" alt=""></a></li>
+                                    <li><a href="#" class="payment-link"><img src="assets/images/card2.jpg" width="51"
+                                                height="36" alt=""></a></li>
+                                    <li><a href="#" class="payment-link"><img src="assets/images/card3.jpg" width="51"
+                                                height="36" alt=""></a></li>
+                                    <li><a href="#" class="payment-link"><img src="assets/images/card4.jpg" width="51"
+                                                height="36" alt=""></a></li>
+                                    <li><a href="#" class="payment-link"><img src="assets/images/card5.jpg" width="51"
+                                                height="36" alt=""></a></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-            </footer>
+                </div>
+            </div>
+    </footer>
 
             <!--Footer For Mobile-->
             <div class="mobile-footer">

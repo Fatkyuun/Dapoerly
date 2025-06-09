@@ -203,7 +203,7 @@ if (!isset($_SESSION["status"]) || $_SESSION["status"] !== "admin") {
         include 'koneksi.php'; // Sesuaikan dengan file koneksi yang kamu gunakan
         
         // Ambil total jumlah pesanan dari tabel tb_pesanan
-        $query = "SELECT COUNT(*) AS tb_pesanan FROM tb_jual";
+        $query = "SELECT COUNT(*) AS total_pesanan FROM tb_jual";
         $result = mysqli_query($koneksi, $query);
         $data = mysqli_fetch_assoc($result);
         $totalPesanan = isset($data['total_pesanan']) ? $data['total_pesanan'] : 0; // Default ke 0 jika tidak ada pesanan

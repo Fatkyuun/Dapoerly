@@ -548,7 +548,7 @@ session_start()
                                     <li>
                                         <p class="info-item">
                                             <i class="biolife-icon icon-clock"></i>
-                                            <b class="desc">Jam Buka: Setiap hari, Selain hari kiamat</b>
+                                            <b class="desc">Hari Buka: Setiap hari, Selain hari kiamat</b>
                                         </p>
                                     </li>
                                 </ul>

@@ -1,68 +1,6 @@
 <?php
 session_start();
-include 'admin/koneksi.php';
-
-// Pastikan ada parameter id_produk yang dikirim dari URL
-$id_produk = isset($_GET['id']) ? mysqli_real_escape_string($koneksi, $_GET['id']) : '';
-
-$query = "SELECT p.nm_produk, p.harga, p.stok, p.desk, p.gambar, k.nm_kategori 
-        FROM tb_produk p
-        JOIN tb_kategori k ON p.id_kategori = k.id_kategori
-        WHERE p.id_produk = '$id_produk'";
-
-$result = $koneksi->query($query);
-$produk = $result->fetch_assoc();
-
-// Query untuk produk lain selain produk yang sedang dibuka
-$query_lainnya = "SELECT id_produk, nm_produk, desk, harga, gambar, (SELECT nm_kategori FROM tb_kategori WHERE tb_kategori.id_kategori = p.id_kategori) as kategori 
-                FROM tb_produk p
-                WHERE id_produk != '$id_produk'
-                ORDER BY RAND()
-                  LIMIT 6"; // batasi sesuai kebutuhan
-
-$result_lainnya = $koneksi->query($query_lainnya);
-
-// Tambahkan pesanan ke database
-if (isset($_POST['add_to_cart'])) {
-    if (!isset($_SESSION['login'])) {
-        echo "<script>alert('Silakan login terlebih dahulu!'); window.location.href='login.php';</script>";
-    } else {
-        $id_user = $_SESSION['id_user'];
-        $qty = intval($_POST['qty']);
-        $total = $produk['harga'] * $qty;
-
-        // Cek stok langsung dari database (lebih aman)
-        $cek_stok = $koneksi->query("SELECT stok FROM tb_produk WHERE id_produk = '$id_produk'");
-        $data_stok = $cek_stok->fetch_assoc();
-
-        if ($qty > $data_stok['stok']) {
-            echo "<script>alert('Stok tidak mencukupi! Stok tersedia: {$data_stok['stok']}');</script>";
-        } else {
-            // Buat id_pesanan otomatis dengan format M001, M002, dst.
-            $query_id = "SELECT id_pesanan FROM tb_pesanan ORDER BY id_pesanan DESC LIMIT 1";
-            $result_id = $koneksi->query($query_id);
-            if ($result_id->num_rows > 0) {
-                $row = $result_id->fetch_assoc();
-                $last_id = intval(substr($row['id_pesanan'], 1)); // Ambil angka dari id terakhir
-                $new_id = "M" . str_pad($last_id + 1, 3, '0', STR_PAD_LEFT); // Format M001, M002
-            } else {
-                $new_id = "M001"; // Jika belum ada pesanan, mulai dari M001
-            }
-
-            // Simpan ke database
-            $query_insert = "INSERT INTO tb_pesanan (id_pesanan, id_produk, qty, total, id_user) 
-                            VALUES ('$new_id', '$id_produk', '$qty', '$total', '$id_user')";
-
-            if ($koneksi->query($query_insert) === TRUE) {
-                echo "<script>alert('Produk berhasil ditambahkan ke keranjang!'); window.location.href='belanja.php';</script>";
-            } else {
-                echo "<script>alert('Terjadi kesalahan saat menambahkan ke keranjang!');</script>";
-            }
-        }
-    }
-}
 ?>
-
 <!DOCTYPE html>
 <html class="no-js" lang="en">
 
@@ -70,7 +8,7 @@ if (isset($_POST['add_to_cart'])) {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Detail Produk - Dapoerly</title>
+    <title>Hubungi Kami - Dapoerly</title>
     <link href="https://fonts.googleapis.com/css?family=Cairo:400,600,700&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Poppins:600&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400i,700i" rel="stylesheet">
@@ -116,36 +54,11 @@ if (isset($_POST['add_to_cart'])) {
             padding: 10px 15px;
             text-decoration: none;
             color: #333;
-            transition: background 0.25s ease;
+            transition: background 0.2s ease;
         }
 
         .logout-list li a:hover {
             background-color: #f2f2f2;
-        }
-
-        .img-wrapper {
-            width: 370px;
-            height: 370px;
-            overflow: hidden;
-            border-radius: 10px;
-            /* optional, blur lebih halus */
-        }
-
-        .square-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-        }
-
-        .minicart-block {
-            margin-right: 30px;
-        }
-
-        .user .qty {
-            margin-left: 5px;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -314,152 +227,91 @@ if (isset($_POST['add_to_cart'])) {
 
     <!--Hero Section-->
     <div class="hero-section hero-background">
-        <h1 class="page-title">Detail Produk</h1>
+        <h1 class="page-title">Hubungi Kami</h1>
     </div>
 
     <!--Navigation section-->
     <div class="container">
-        <nav class="biolife-nav">
+        <nav class="biolife-nav nav-86px">
             <ul>
                 <li class="nav-item"><a href="index.php" class="permal-link">Beranda</a></li>
-                <li class="nav-item"><a href="belanja.php" class="permal-link">Belanja</a></li>
-                <li class="nav-item"><span class="current-page">Detail Produk</span></li>
+                <li class="nav-item"><span class="current-page">Hubungi Kami</span></li>
             </ul>
         </nav>
     </div>
 
-    <div class="page-contain single-product">
-        <div class="container">
+    <div class="page-contain contact-us">
 
-            <!-- Main content -->
-            <div id="main-content" class="main-content">
+        <!-- Main content -->
+        <div id="main-content" class="main-content">
+            <div class="wrap-map biolife-wrap-map" id="map-block">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3958.9737302170597!2d111.58744367410984!3d-7.1290351699173575!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e776411abeabb93%3A0x3ccba806cf9ef497!2sSTT%20Ronggolawe%20Cepu!5e0!3m2!1sid!2sid!4v1744819390178!5m2!1sid!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
 
-                <!-- summary info -->
-                <div class="sumary-product single-layout">
-                    <div class="media">
-                        <ul class="biolife-carousel slider-for"
-                            data-slick='{"arrows":false,"dots":false,"slidesMargin":30,"slidesToShow":1,"slidesToScroll":1,"fade":true,"asNavFor":".slider-nav"}'>
-                            <li><img src="admin/produk_img/<?php echo $produk['gambar']; ?>" alt=""
-                                    class="square-detail-img"></li>
-                        </ul>
-                    </div>
-                    <div class="product-attribute">
-                        <h3 class="title"><?php echo $produk['nm_produk']; ?></h3>
-                        <span class="sku"><?php echo $produk['nm_kategori']; ?></span>
-                        <p class="excerpt"><?php echo nl2br($produk['desk']); ?></p>
-                        <div class="price">
-                            <ins><span class="price-amount"><span
-                                        class="currencySymbol">Rp.</span><?php echo number_format($produk['harga'], 0, ',', '.'); ?></span></ins>
+            <div class="container">
+
+                <div class="row">
+
+                    <!--Contact info-->
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="contact-info-container sm-margin-top-27px xs-margin-bottom-60px xs-margin-top-60px">
+                            <h4 class="box-title">Kontak Kami</h4>
+                            <p class="frst-desc">
+                                Kami siap membantu Anda! Jika Anda memiliki pertanyaan, masukan, atau ingin mengetahui lebih lanjut tentang produk dan layanan kami, jangan ragu untuk menghubungi kami. Tim kami akan dengan senang hati merespons Anda secepat mungkin.
+                            </p>
+                            <ul class="addr-info">
+                                <li>
+                                    <div class="if-item">
+                                        <b class="tie">Alamat:</b>
+                                        <p class="dsc">7Jl. Kampus Ronggolawe No.1 Mentul, Indah, Komp. Pertamina,<br>Karangboyo, Kec. Cepu, Kabupaten Blora, Jawa Tengah 58315</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="if-item">
+                                        <b class="tie">Telepon:</b>
+                                        <p class="dsc">085895996383</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="if-item">
+                                        <b class="tie">Email:</b>
+                                        <p class="dsc">dapoerly@gmail.com</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="if-item">
+                                        <b class="tie">Toko Buka:</b>
+                                        <p class="dsc">Sen-Jum: 8:30-19:30; Sab-Min: 9:30-16:30</p>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="shipping-info">
-                        </div>
                     </div>
-                    <form action="" method="post">
-                        <div class="action-form">
-                            <div class="quantity-box">
-                                <span class="title">Quantity:</span>
-                                <div class="qty-input">
-                                    <input type="text" name="qty" value="1" data-max_value="20" data-min_value="1"
-                                        data-step="1">
-                                    <a href="#" class="qty-btn btn-up"><i class="fa fa-caret-up"
-                                            aria-hidden="true"></i></a>
-                                    <a href="#" class="qty-btn btn-down"><i class="fa fa-caret-down"
-                                            aria-hidden="true"></i></a>
-                                </div>
-                            </div>
-                            <div class="buttons">
-                                <button type="submit" class="btn add-to-cart-btn" name="add_to_cart">Keranjang</button>
-                                <p class="pull-row">
-                                    <a href="#" class="btn wishlist-btn">wishlist</a>
-                                    <a href="#" class="btn compare-btn">compare</a>
+
+                    <!--Contact form-->
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="contact-form-container sm-margin-top-112px">
+                            <form action="#" name="frm-contact">
+                                <p class="form-row">
+                                    <input type="text" name="name" value="" placeholder="Nama Anda" class="txt-input">
                                 </p>
-                            </div>
-                            <div class="acepted-payment-methods">
-                                <ul class="payment-methods">
-                                    <li><img src="assets/images/card1.jpg" alt="" width="51" height="36"></li>
-                                    <li><img src="assets/images/card2.jpg" alt="" width="51" height="36"></li>
-                                    <li><img src="assets/images/card3.jpg" alt="" width="51" height="36"></li>
-                                    <li><img src="assets/images/card4.jpg" alt="" width="51" height="36"></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Tab info -->
-                <div class="product-tabs single-layout biolife-tab-contain">
-                    <div class="tab-head">
-                        <ul class="tabs">
-                            <li class="tab-element active"><a href="#tab_1st" class="tab-link">Deskripsi</a></li>
-                            <li class="tab-element"><a href="#tab_2nd" class="tab-link">Stok</a></li>
-                        </ul>
-                    </div>
-                    <div class="tab-content">
-                        <div id="tab_1st" class="tab-contain desc-tab active">
-                            <p class="desc"><?php echo nl2br($produk['desk']); ?></p>
-                        </div>
-                        <div id="tab_2nd" class="tab-contain addtional-info-tab">
-                            <table class="tbl_attributes">
-                                <tbody>
-                                    <tr>
-                                        <th><?php echo $produk['stok']; ?></th>
-                                        <td>
-                                            <p>Kg</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                <p class="form-row">
+                                    <input type="email" name="email" value="" placeholder="Alamat Email Anda" class="txt-input">
+                                </p>
+                                <p class="form-row">
+                                    <input type="tel" name="phone" value="" placeholder="Nomor Telepon Anda" class="txt-input">
+                                </p>
+                                <p class="form-row">
+                                    <textarea name="mes" id="mes-1" cols="30" rows="9" placeholder="Tinggalkan Pesan"></textarea>
+                                </p>
+                                <p class="form-row">
+                                    <button class="btn btn-submit" type="submit">kirim pesan</button>
+                                </p>
+                            </form>
                         </div>
                     </div>
-                </div>
-
-                <!-- related products -->
-                <div class="product-related-box single-layout">
-                    <div class="biolife-title-box lg-margin-bottom-26px-im">
-                        <span class="biolife-icon icon-organic"></span>
-                        <span class="subtitle">Semua Produk Terbaik Untuk Anda</span>
-                        <h3 class="main-title">Produk Terkait</h3>
-                    </div>
-                    <ul class="products-list biolife-carousel nav-center-02 nav-none-on-mobile"
-                        data-slick='{"rows":1,"arrows":true,"dots":false,"infinite":false,"speed":400,"slidesMargin":0,"slidesToShow":5, "responsive":[{"breakpoint":1200, "settings":{ "slidesToShow": 4}},{"breakpoint":992, "settings":{ "slidesToShow": 3, "slidesMargin":20 }},{"breakpoint":768, "settings":{ "slidesToShow": 2, "slidesMargin":10}}]}'>
-
-                        <?php while ($produk_lain = $result_lainnya->fetch_assoc()): ?>
-                            <li class="product-item">
-                                <div class="contain-product layout-default">
-                                    <div class="product-thumb">
-                                        <a href="detail_produk.php?id=<?= $produk_lain['id_produk']; ?>"
-                                            class="link-to-product">
-                                            <img src="admin/produk_img/<?= $produk_lain['gambar']; ?>"
-                                                alt="<?= $produk_lain['nm_produk']; ?>"
-                                                class="product-thumbnail square-image">
-                                        </a>
-                                    </div>
-                                    <div class="info">
-                                        <b class="categories"><?= $produk_lain['kategori']; ?></b>
-                                        <h4 class="product-title"><a
-                                                href="detail_produk.php?id=<?= $produk_lain['id_produk']; ?>"
-                                                class="pr-name"><?= $produk_lain['nm_produk']; ?></a></h4>
-                                        <div class="price">
-                                            <ins><span class="price-amount"><span
-                                                        class="currencySymbol">Rp.</span><?= number_format($produk_lain['harga'], 0, ',', '.'); ?></span></ins>
-                                        </div>
-                                        <div class="slide-down-box">
-                                            <p class="message"><?= $produk_lain['desk']; ?></p>
-                                            <div class="buttons">
-                                                <a href="detail_produk.php?id=<?= $produk_lain['id_produk']; ?>"
-                                                    class="btn add-to-cart-btn">
-                                                    <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>Keranjang
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        <?php endwhile; ?>
-                    </ul>
 
                 </div>
-
             </div>
         </div>
     </div>
@@ -590,8 +442,7 @@ if (isset($_POST['add_to_cart'])) {
                 </a>
             </div>
             <div class="mobile-block block-global">
-                <a class="menu-bar myaccount-toggle btn-toggle" data-object="global-panel-opened"
-                    href="javascript:void(0)">
+                <a class="menu-bar myaccount-toggle btn-toggle" data-object="global-panel-opened" href="javascript:void(0)">
                     <span class="fa fa-globe"></span>
                     <span class="text">Global</span>
                 </a>
@@ -625,14 +476,10 @@ if (isset($_POST['add_to_cart'])) {
             <div class="glb-item languages">
                 <b class="title">Language</b>
                 <ul class="list inline">
-                    <li class="list-item"><a href="#"><img src="assets/images/languages/us.jpg" alt="flag" width="24"
-                                height="18"></a></li>
-                    <li class="list-item"><a href="#"><img src="assets/images/languages/fr.jpg" alt="flag" width="24"
-                                height="18"></a></li>
-                    <li class="list-item"><a href="#"><img src="assets/images/languages/ger.jpg" alt="flag" width="24"
-                                height="18"></a></li>
-                    <li class="list-item"><a href="#"><img src="assets/images/languages/jap.jpg" alt="flag" width="24"
-                                height="18"></a></li>
+                    <li class="list-item"><a href="#"><img src="assets/images/languages/us.jpg" alt="flag" width="24" height="18"></a></li>
+                    <li class="list-item"><a href="#"><img src="assets/images/languages/fr.jpg" alt="flag" width="24" height="18"></a></li>
+                    <li class="list-item"><a href="#"><img src="assets/images/languages/ger.jpg" alt="flag" width="24" height="18"></a></li>
+                    <li class="list-item"><a href="#"><img src="assets/images/languages/jap.jpg" alt="flag" width="24" height="18"></a></li>
                 </ul>
             </div>
         </div>
