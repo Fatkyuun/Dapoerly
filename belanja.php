@@ -446,7 +446,7 @@ session_start()
                                                             echo '<li>Daging Segar</li><li>Potongan Segar dan Berkualitas</li>';
                                                             break;
                                                         default:
-                                                            echo '<li> </li><li> </li>';
+                                                            echo '<li>100% Lokal</li><li>Alami, Bukan Sintetis</li>';
                                                             break;
                                                     }
                                                     ?>
